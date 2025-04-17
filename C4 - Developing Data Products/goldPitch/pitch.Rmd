@@ -1,0 +1,106 @@
+---
+title: "Gold Price Predictor"
+author: "Cesar Robles"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+  ioslides_presentation:
+    self_contained: true
+  slidy_presentation: default
+---
+## Introduction
+### **Gold Price Predictor**  
+An interactive Shiny application that forecasts the average annual gold price (USD / oz) using a simple linear regression on historical GLD ETF data.  
+
+**Key features:**  
+- Input any year from **2000** up to **current**  
+- Get an immediate **predicted price**  
+- Explore an **interactive Plotly chart** of past data and your prediction  
+
+## Problem Statement
+Gold prices are **highly volatile** from year to year, making it hard for investors and analysts to:
+
+- **Plan budgets** when input costs depend on gold  
+- **Manage risk** in gold‐backed portfolios  
+- **Forecast returns** in commodities markets  
+
+## Problem Statement (Cont.)
+Below is the recent short‐term trend, illustrating the day‑to‑day swings in the GLD ETF:
+```{r plot_problem, echo=FALSE, message=FALSE, warning=FALSE, fig.width=6, fig.height=4}
+library(quantmod)
+library(ggplot2)
+
+# Fetch last 20 trading days of GLD ETF
+gld_xts <- getSymbols("GLD", src="yahoo", auto.assign = FALSE)
+gld_df <- data.frame(
+  date  = index(tail(gld_xts, 20)),
+  close = as.numeric(Cl(tail(gld_xts, 20)))
+)
+
+# Mini time-series of recent GLD closes
+ggplot(gld_df, aes(x = date, y = close)) +
+  geom_line(color = "goldenrod", size = 1) +
+  geom_point(color = "darkgoldenrod", size = 2) +
+  labs(
+    title = "GLD ETF: Last 20 Trading Days",
+    x     = "Date",
+    y     = "Close Price (USD)"
+  ) +
+  theme_minimal()
+```
+
+## Our Solution
+
+- **User Input:** Select any year from 2000 up to today via a simple numeric control.  
+- **Model Logic:** A linear regression trained on historical GLD ETF annual averages.  
+- **Reactive Prediction:** The server instantly computes the forecasted gold price for your chosen year.  
+- **Interactive Display:** An embedded Plotly chart shows the full history and highlights your predicted point.  
+
+## Live Demo
+Use the slider (or input box) below to select any year. The app will instantly predict the average gold price for that year and highlight it on the chart.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(quantmod)
+library(plotly)
+library(dplyr)
+
+# Fetch & summarise annual GLD ETF data
+gld_xts <- getSymbols("GLD", src="yahoo", auto.assign=FALSE)
+df <- data.frame(
+  date  = index(gld_xts),
+  price = as.numeric(Cl(gld_xts))
+) %>%
+  mutate(year = as.integer(format(date, "%Y"))) %>%
+  group_by(year) %>%
+  summarize(price = mean(price, na.rm = TRUE)) %>%
+  ungroup()
+
+# Fit linear model
+model <- lm(price ~ year, data = df)
+
+# Build interactive Plotly figure
+fig <- plot_ly(
+  df, x = ~year, y = ~price,
+  type = "scatter", mode = "markers",
+  marker = list(color = "goldenrod", size = 6)
+) %>%
+  add_lines(
+    x = ~year, y = fitted(model),
+    line = list(color = "darkgoldenrod", width = 2)
+  ) %>%
+  add_markers(
+    x = max(df$year), 
+    y = predict(model, data.frame(year = max(df$year))),
+    marker = list(color = "red", size = 10)
+  ) %>%
+  layout(
+    title = "Gold Price Prediction",
+    xaxis = list(title = "Year"),
+    yaxis = list(title = "Average GLD Close (USD)")
+  )
+fig
+```
+
+## Next Steps
+- Explore non-linear models (polynomial regression, ARIMA)  
+- Incorporate macroeconomic indicators (inflation, interest rates)  
+- Gather user feedback and refine the app
