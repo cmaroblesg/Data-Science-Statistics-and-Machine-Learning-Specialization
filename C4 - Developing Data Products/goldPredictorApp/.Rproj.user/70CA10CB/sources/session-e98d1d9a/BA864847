@@ -1,0 +1,26 @@
+{
+    "id": "BA864847",
+    "path": "~/Documents/Projects/Test_Projects/goldPredictorApp/server.R",
+    "project_path": "server.R",
+    "type": "r_source",
+    "hash": "2090731947",
+    "contents": "",
+    "dirty": false,
+    "created": 1744902764508.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "54,4",
+        "scrollLine": "30"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1744903350,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1744903350523,
+    "read_only": false,
+    "read_only_alternatives": []
+}

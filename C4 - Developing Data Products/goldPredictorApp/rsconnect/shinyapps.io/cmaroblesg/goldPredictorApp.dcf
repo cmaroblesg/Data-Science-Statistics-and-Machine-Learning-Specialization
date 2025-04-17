@@ -1,0 +1,10 @@
+name: goldPredictorApp
+title:
+username: cmaroblesg
+account: cmaroblesg
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 14547776
+bundleId: 10132649
+url: https://cmaroblesg.shinyapps.io/goldPredictorApp/
+version: 1
